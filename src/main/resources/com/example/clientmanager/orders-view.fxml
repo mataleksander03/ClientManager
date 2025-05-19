@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane fx:id="rootPane"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.clientmanager.OrdersController">
+    <!-- GÓRNY PASEK FILTRÓW -->
+    <top>
+        <ToolBar>
+            <Label text="Cena:"/>
+            <TextField fx:id="minPriceField" promptText="od"/>
+            <TextField fx:id="maxPriceField" promptText="do"/>
+            <Button text="Filtruj ceny" onAction="#onPrices"/>
+            <Label text="SKU:"/>
+            <TextField fx:id="skuField" promptText="ABC123"/>
+            <Button text="Filtruj SKU" onAction="#onSKU"/>
+
+            <Label text="Imię i nazwisko:"/>
+            <TextField fx:id="nameField" promptText="Andrzej Kowalski"/>
+            <Button text="Filtruj Imię" onAction="#onName"/>
+
+            <Button text="Szukaj" onAction="#onSearch"/>
+            <Pane xmlns:fx="http://javafx.com/fxml" HBox.hgrow="ALWAYS"/>
+            <Button text="Wyczyść filtry" onAction="#onClearFilters"/>
+            <Button text="Zaaktualizuj zamówienia" onAction="#onAdd"/>
+        </ToolBar>
+    </top>
+    <!-- CENTRUM: ZAKŁADKI -->
+    <center>
+        <TabPane fx:id="mainTabs">
+            <tabs>
+                <!-- TAB: Lista zamówień -->
+                <Tab text="Orders" closable="false">
+                    <AnchorPane>
+                        <TableView fx:id="orderTable"
+                                   AnchorPane.topAnchor="0"
+                                   AnchorPane.rightAnchor="0"
+                                   AnchorPane.bottomAnchor="0"
+                                   AnchorPane.leftAnchor="0">
+                            <columns>
+                                <TableColumn fx:id="idCol"        text="ID"            prefWidth="60"/>
+                                <TableColumn fx:id="customerCol"  text="Klient"        prefWidth="160"/>
+                                <TableColumn fx:id="priceCol"     text="Cena"          prefWidth="90"/>
+                                <TableColumn fx:id="statusCol"    text="Status"        prefWidth="100"/>
+                                <TableColumn fx:id="SKUCol"    text="SKU produktow"        prefWidth="400"/>
+                            </columns>
+                        </TableView>
+                    </AnchorPane>
+                </Tab>
+                <!-- TAB: Dokumentacja -->
+                <Tab text="Dokumentacja" closable="false">
+                    <ScrollPane fitToWidth="true">
+                        <content>
+                            <VBox spacing="8" style="-fx-padding: 12;">
+                                <!-- 1. Struktury danych -->
+                                <Label text="1. Zaawansowane struktury danych" style="-fx-font-weight: bold;"/>
+                                <Label wrapText="true" text="• Filtruj ceny: TreeMap&lt;Double, List&lt;Order&gt;&gt; – zbalansowane drzewo BST zapewniające naturalne porządkowanie cen."/>
+                                <Label wrapText="true" text="• Filtruj SKU: HashMap&lt;String, List&lt;Order&gt;&gt; – natychmiastowy dostęp do listy zamówień dla danego towaru."/>
+                                <Label wrapText="true" text="• Filtruj Imię: HashMap&lt;String, Set&lt;Order&gt;&gt; – szybkie wyszukiwanie tokenów imienia/nazwiska."/>
+
+                                <!-- 2. Powody wyboru -->
+                                <Label text="2. Powody wyboru" style="-fx-font-weight: bold;"/>
+                                <Label wrapText="true" text="TreeMap umożliwia pobranie przedziału cen metodą subMap w czasie O(log n + k), gdzie k to liczba trafień."/>
+                                <Label wrapText="true" text="HashMap dla SKU gwarantuje średnio O(1) wyszukanie klucza; lista zachowuje kolejność dodawania i może zawierać duplikaty."/>
+                                <Label wrapText="true" text="Set dla imion eliminuje duplikaty i umożliwia szybkie przecięcia kilku zbiorów (np. 'imię ∧ nazwisko')."/>
+
+                                <!-- 3. Złożoności -->
+                                <Label text="3. Złożoności obliczeniowe" style="-fx-font-weight: bold;"/>
+                                <Label wrapText="true" text="• TreeMap: get / put O(log n); subMap(min,max) O(log n + k)."/>
+                                <Label wrapText="true" text="• HashMap: get / put O(1) amortyzowane; iteracja po liście wyników O(k)."/>
+                                <Label wrapText="true" text="• Set (HashSet): add / contains O(1); przecięcie dwóch zbiorów O(min(|A|,|B|))."/>
+
+                                <!-- 4. Set vs List -->
+                                <Label text="4. Set dla imion vs. Lista dla SKU" style="-fx-font-weight: bold;"/>
+                                <Label wrapText="true" text="Przy imionach zależy nam na unikalności oraz szybkich przecięciach zbiorów (imię ∧ nazwisko), dlatego wykorzystywany jest Set."/>
+                                <Label wrapText="true" text="Dla SKU chcemy zachować wszystkie wystąpienia produktu w zamówieniu, dlatego przechowujemy je w liście."/>
+
+                                <!-- 5. onSearch -->
+                                <Label text="5. Zasada działania onSearch" style="-fx-font-weight: bold;"/>
+                                <Label wrapText="true" text="Metoda onSearch pobiera parametry filtrów, tworzy wstępne listy kandydatów z TreeMap/HashMap/Set, wybiera najmniejszą z nich, a następnie wykonuje końcowe filtrowanie strumieniowe."/>
+                                <Label wrapText="true" text="Całkowita złożoność = O(log n + m) dla filtra cen (m – liczba kandydatów), O(1 + k) dla SKU (k – wyników), O(min(|A|,|B|)) dla imion oraz O(b·p) dla końcowego .filter(), gdzie b to wielkość bazowej listy i p liczba aktywnych warunków."/>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <!-- DOLNY PASEK STATYSTYK -->
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="16" style="-fx-padding: 6;">
+            <Label text="Razem zamówień:"/>
+            <Label fx:id="countLabel" text="0"/>
+            <Label text="Czas realizacji filtru:"/>
+            <Label fx:id="avgTimeLabel" text="‑"/>
+        </HBox>
+    </bottom>
+</BorderPane>
