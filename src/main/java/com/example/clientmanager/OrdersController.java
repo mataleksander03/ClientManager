@@ -88,9 +88,15 @@ public class OrdersController {
             justAdded.add(newOrder);
         }
 
+        long start, end;
+        start = System.nanoTime();
         populatePriceMap(justAdded);        // dopisujemy tylko nowe rekordy do mapy cen
         populateSkuMap(justAdded);       // aktualizujemy indeks SKU
         indexNames(justAdded);            // hashmap, set imion i nazwisk
+        end = System.nanoTime();
+        long duration = end - start;
+
+        avgTimeLabel.setText(String.format("%.2f μs", (double) duration/1_000));
         updateOrderCount();                 // odświeżamy licznik w Label
         orderTable.sort();
     }
